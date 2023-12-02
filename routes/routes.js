@@ -1,16 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../model/schema"); // import o schema do banco de dados
+const User = require("../model/schema"); // Certifique-se de que o caminho está correto
 
-//inserir um usuário na rota do banco de dados
+// Rota para adicionar um usuário
 router.post("/add", (req, res) => {
-  console.log(req);
-  const user = new User({
-    nome: null,
-    email: req.body.email,
-    cpf: req.body.cpf,
-  });
-  console.log(req.body);
+  const { nome, email, cpf } = req.body;
+  if (!email || !cpf) {
+    return res.status(400).json({ message: "Email e CPF são obrigatórios", type: "danger" });
+  }
+
+  const user = new User({ nome, email, cpf });
   user.save((err) => {
     if (err) {
       res.json({ message: err.message, type: "danger" });
@@ -24,18 +23,13 @@ router.post("/add", (req, res) => {
   });
 });
 
-// obtém todas as rotas do usuário
+// Rota para exibir todos os usuários
 router.get("/", (req, res) => {
   User.find().exec((err, users) => {
     if (err) {
-      res.json({
-        message: err.message,
-      });
+      res.json({ message: err.message });
     } else {
-      res.render("index", {
-        title: "Pagina inicial",
-        users: users,
-      });
+      res.render("index", { title: "Página Inicial", users: users });
     }
   });
 });
